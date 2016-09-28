@@ -1,0 +1,38 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1504
+{\fonttbl\f0\fmodern\fcharset0 Courier;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;\csgray\c100000;}
+\paperw15840\paperh12240\margl1440\margr1440\vieww20020\viewh11360\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 Key:\
+\
+docker run -d -p 8125:8125/udp -p 8126:8126 -p 3000:80 --name grafana kamon/grafana_graphite\
+\
+{\field{\*\fldinst{HYPERLINK "http://localhost:3000"}}{\fldrslt http://localhost:3000}}\
+\
+docker run -e HOST_NAME=host0 \\\
+-e GRAPHITE_HOST=$(docker inspect --format '\{\{ .NetworkSettings.IPAddress \}\}' grafana) \\\
+-e GRAPHITE_PORT=2003 \\\
+-e COLLECT_INTERVAL=1 \\\
+-d --name host0 andreasjansson/collectd-write-graphite\
+\
+./spawn_hosts.sh\
+\
+docker build -t tolbertam/docker-getting-started-presentation .\
+\
+docker login\
+\
+docker push tolbertam/docker-getting-started-presentation\
+\
+\pard\pardeftab720\partightenfactor0
+\cf0 gcloud config set compute/zone us-central1-b\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 \
+gcloud container clusters create docker-cluster\
+\
+kubectl run pres --image=tolbertam/docker-getting-started-presentation:latest --port=8000\
+\
+kubectl expose deployment pres --type="LoadBalancer"\
+\
+kubectl get service}
